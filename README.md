@@ -2,6 +2,6 @@
 CSC458 Project
 
 *NOTE:
-1) you will need a directory called 'data' under src/c_script
-2) you will need a csv file called "package_dissection_incsv" under src/r_script
-	- you can download the file through the link: https://drive.google.com/file/d/1fqSrRpoIXx8eFPOvyMus-nMprTK6HdYI/view?usp=drive_web 
+1) you need download wireshark
+2) you need a put raw pcap file in /data, then run /data/convert <pcap filename> to extract information needed for /src/r_script/analysis_perpack.r
+3) you should modify /src/r_script/analysis_perpack.r, change value of two variables called "data_dir" and "img_dir" with your own path 
