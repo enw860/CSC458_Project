@@ -6,16 +6,29 @@ library(ggplot2)
 data_dir <- "~/CSC458_Project/data/"
 img_dir <- "~/CSC458_Project/r_plots/"
 
-plot_scatter <- TRUE
-plot_ecdf <- TRUE
-plot_cdf <- TRUE
-
 other_net_protocol <- c("MS NLB", "LLC", "IPX", "Intel ANS probe")
 other_trans_protocol <- c("VRRP", "PIMv0", "OSPF", "NCS", "IGMPv0", "GRE", "ESP", "IGRP")
+
+x_label <- "packet length"
+y_label <- "cummulate probability"
+
+bool_switch <- function(num){
+  if(num == 0){
+    return(FALSE)
+  }else{
+    return(TRUE)
+  }
+}
 
 set_filePath<- function(dir, filename){
   return(paste(dir,filename, sep=""))
 }
+
+######################### start control box #####################
+plot_scatter <- bool_switch(1)
+plot_ecdf <- bool_switch(1)
+plot_cdf <- bool_switch(1)
+######################### end control box #####################
 
 # plot precentage tables
 plot_precentage_tables <- function(data, dir){
@@ -105,14 +118,12 @@ make_table <- function(data, title){
 
 # plots for packet length analysis for bullet point 2
 plot_total_packlen_cdf <- function(data, ip_data, non_ip_data, dir){
-  x_label <- 'Sample Quantiles of size'
-  
   # scatter plot
   if(plot_scatter){
     png(set_filePath(dir, "packlen_total_scatter.png"), height=800, width=1000)
     
     par(mfrow=c(1,1))
-    plot(data$frame.len[!is.na(data$frame.len)], xlab=x_label, main="Total length scatter", col="black")
+    plot(data$frame.len[!is.na(data$frame.len)], xlab="index",  ylab="packet size", main="Total length scatter")
     dev.off();
   }
   
@@ -122,7 +133,7 @@ plot_total_packlen_cdf <- function(data, ip_data, non_ip_data, dir){
     
     par(mfrow=c(1,1))
     total_len_ecdf <- ecdf(data$frame.len[!is.na(data$frame.len)])
-    plot(total_len_ecdf, xlab=x_label, main="Total length ecdf", col="black")
+    plot(total_len_ecdf, xlab=x_label, ylab=y_label, main="Total length ecdf")
     dev.off();
   }
   
@@ -131,8 +142,7 @@ plot_total_packlen_cdf <- function(data, ip_data, non_ip_data, dir){
     png(set_filePath(dir, "packlen_total_cdf.png"), height=800, width=1000)
     
     par(mfrow=c(1,1))
-    total_len_cdf <- cumsum(data$frame.len[!is.na(data$frame.len)])
-    plot(total_len_cdf, xlab=x_label, main="Total length cdf", col="black")
+    cdf(data$frame.len, "Total length cdf")
     dev.off();
   }
   
@@ -143,10 +153,10 @@ plot_total_packlen_cdf <- function(data, ip_data, non_ip_data, dir){
   if(plot_scatter){
     png(set_filePath(dir, "packlen_scatter.png"), height=800, width=1000)
     par(mfrow=c(2,2))
-    plot(ip_data$frame.len[!is.na(ip_data$frame.len)], xlab=x_label, main="IP Packet Length scatter", col="red")
-    plot(non_ip_data$frame.len[!is.na(non_ip_data$frame.len)], xlab=x_label, main="non-IP Packet Length scatter", col="pink")
-    plot(tcp_data[!is.na(tcp_data)], xlab=x_label, main="TCP Packet Length scatter", col="blue")
-    plot(udp_data[!is.na(udp_data)], xlab=x_label, main="UDP Packet Length scatter", col="yellow")
+    plot(ip_data$frame.len[!is.na(ip_data$frame.len)], xlab="index",  ylab="packet size", main="IP Packet Length scatter")
+    plot(non_ip_data$frame.len[!is.na(non_ip_data$frame.len)],  xlab="index",  ylab="packet size", main="non-IP Packet Length scatter")
+    plot(tcp_data[!is.na(tcp_data)], xlab="index",  ylab="packet size", main="TCP Packet Length scatter")
+    plot(udp_data[!is.na(udp_data)], xlab="index",  ylab="packet size", main="UDP Packet Length scatter")
     dev.off()
   }
   
@@ -159,12 +169,11 @@ plot_total_packlen_cdf <- function(data, ip_data, non_ip_data, dir){
     tcp_len_ecdf <- ecdf(tcp_data[!is.na(tcp_data)])
     udp_len_ecdf <- ecdf(udp_data[!is.na(udp_data)])
   
-  
     par(mfrow=c(2,2))
-    plot(ip_len_ecdf, xlab=x_label, main="IP Packet Length ecdf", col="red")
-    plot(non_ip_len_ecdf, xlab=x_label, main="non-IP Packet Length ecdf", col="pink")
-    plot(tcp_len_ecdf, xlab=x_label, main="TCP Packet Length ecdf", col="blue")
-    plot(udp_len_ecdf, xlab=x_label, main="UDP Packet Length ecdf", col="yellow")
+    plot(ip_len_ecdf, xlab=x_label, ylab=y_label, main="IP Packet Length ecdf")
+    plot(non_ip_len_ecdf, xlab=x_label, ylab=y_label, main="non-IP Packet Length ecdf")
+    plot(tcp_len_ecdf, xlab=x_label, ylab=y_label, main="TCP Packet Length ecdf")
+    plot(udp_len_ecdf, xlab=x_label, ylab=y_label, main="UDP Packet Length ecdf")
     dev.off()
   }
   
@@ -172,32 +181,25 @@ plot_total_packlen_cdf <- function(data, ip_data, non_ip_data, dir){
   if(plot_cdf){
     png(set_filePath(dir, "packlen_cdfs.png"), height=800, width=1000)
     
-    ip_len_cdf <- cumsum(ip_data$frame.len[!is.na(ip_data$frame.len)])
-    non_ip_len_cdf <- cumsum(non_ip_data$frame.len[!is.na(non_ip_data$frame.len)])
-    tcp_len_cdf <- cumsum(tcp_data[!is.na(tcp_data)])
-    udp_len_cdf <- cumsum(udp_data[!is.na(udp_data)])
-    
     par(mfrow=c(2,2))
-    plot(ip_len_cdf, main="IP header cdf", col="black")
-    plot(non_ip_len_cdf, main="Non_IP header cdf", col="pink")
-    plot(tcp_len_cdf, main="TCP header cdf", col="blue")
-    plot(udp_len_cdf, main="UDP header cdf", col="red")
+    cdf(ip_data$frame.len, "IP Packet Length cdf")
+    cdf(non_ip_data$frame.len, "Non_IP Packet Length cdf")
+    cdf(tcp_data, "TCP Packet Length cdf")
+    cdf(udp_data, "UDP Packet Length cdf")
     dev.off()
   }
 }
 
 # plots for header length analysis for bullet point 2
 plot_total_headerlen_cdf <- function(data, dir){
-  x_label <- 'Sample Quantiles of size'
-  
   # scatter plots
   if(plot_scatter){
     png(set_filePath(img_dir, "header_length_scatter.png"), height=800, width=1000)
   
     par(mfrow=c(2,2))
-    plot(data$ip.header[!is.na(data$ip.header)], xlab=x_label, main="IP header scatter")
-    plot(data$tcp.header[!is.na(data$tcp.header)], xlab=x_label, main="TCP header scatter")
-    plot(data$udp.header[!is.na(data$udp.header)], xlab=x_label, main="UDP header scatter")
+    plot(data$ip.header[!is.na(data$ip.header)], xlab="index",  ylab="packet size", main="IP header scatter")
+    plot(data$tcp.header[!is.na(data$tcp.header)], xlab="index",  ylab="packet size", main="TCP header scatter")
+    plot(data$udp.header[!is.na(data$udp.header)], xlab="index",  ylab="packet size", main="UDP header scatter")
     dev.off()
   }
   
@@ -210,9 +212,9 @@ plot_total_headerlen_cdf <- function(data, dir){
     udp_header_ecdf <- ecdf(data$udp.header[!is.na(data$udp.header)])
     
     par(mfrow=c(2,2))
-    plot(ip_header_ecdf, xlab=x_label, main="IP header cdf")
-    plot(tcp_header_ecdf, xlab=x_label, main="TCP header cdf")
-    plot(udp_header_ecdf, xlab=x_label, main="UDP header cdf")
+    plot(ip_header_ecdf, xlab=x_label, ylab=y_label, main="IP header cdf")
+    plot(tcp_header_ecdf, xlab=x_label, ylab=y_label, main="TCP header cdf")
+    plot(udp_header_ecdf, xlab=x_label, ylab=y_label, main="UDP header cdf")
     dev.off()
   }
   
@@ -220,16 +222,27 @@ plot_total_headerlen_cdf <- function(data, dir){
   if(plot_cdf){
     png(set_filePath(img_dir, "header_length_cdfs.png"), height=800, width=1000)
     
-    ip_header_cdf <- cumsum(data$ip.header[!is.na(data$ip.header)])
-    tcp_header_cdf <- cumsum(data$tcp.header[!is.na(data$tcp.header)])
-    udp_header_cdf <- cumsum(data$udp.header[!is.na(data$udp.header)])
-    
     par(mfrow=c(2,2))
-    plot(ip_header_cdf, main="IP header cdf", col="black")
-    plot(tcp_header_cdf,main="TCP header cdf", col="yellow")
-    plot(udp_header_cdf, main="UDP header cdf", col="blue")
+    cdf(data$ip.header, "IP header cdf")
+    cdf(data$tcp.header, "TCP header cdf")
+    cdf(data$udp.header, "UDP header cdf")
     dev.off()
   }
+}
+
+cdf <- function(data, title){
+  data <- data[!is.na(data)]
+  
+  precent_tb <- table(data)/length(data)
+  precenatage <- cumsum(rep(unname(precent_tb)))
+  packet_length <- (as.integer(names(precent_tb)))
+  
+  min_packlen <- min(packet_length)
+  max_packlen <- max(packet_length)
+  
+  plot(packet_length, precenatage, main=title, xlab=x_label, ylab=y_label, col="red", type="l", xlim=c(min_packlen, max_packlen), ylim=c(0,1))
+  abline(h = 0, lty = 2)
+  abline(h = 1, lty = 2)
 }
 
 # Load data
@@ -265,4 +278,3 @@ plot_precentage_tables(data, img_dir)
 # plot per-packet analysis bullet point 2
 plot_total_packlen_cdf(data, ip_data, non_ip_data, img_dir)
 plot_total_headerlen_cdf(ip_data, img_dir)
-
