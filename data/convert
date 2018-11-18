@@ -2,7 +2,7 @@
 
 if [ $# -eq 1 ]; then 
 	echo "Start Converting"
-	tshark -r $1 -T fields -e frame.len -e ip.len -e tcp.len -e udp.length -e _ws.col.Protocol -E header=y > result.txt
+	tshark -r $1 -T fields -e _ws.col.Protocol -e frame.len -e frame.cap_len -e ip.hdr_len -e ip.len -e tcp.hdr_len -e tcp.len -e udp.length -E header=y > result.txt
 	echo "Finish Converting, result saved to result.txt"
 else
 	echo "USAGE: ./convert <pcap file path>"
