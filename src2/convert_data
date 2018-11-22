@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ $# -eq 1 ]; then 
+	echo "Start Converting all packets"
+	tshark -r $1 -T fields -e _ws.col.Protocol -e frame.len -e frame.cap_len -e ip.hdr_len -e ip.len -e tcp.hdr_len -e tcp.len -e udp.length -E header=y > ./data/result.tsv
+
+	echo "Start make tcp file"
+	tshark -r $1 -T fields -e _ws.col.Protocol -e tcp.stream -e tcp.nxtseq -e tcp.ack -e tcp.analysis.ack_rtt -e tcp.analysis.initial_rtt -e tcp.connection.fin -e tcp.connection.rst -e tcp.connection.syn -e ip.dst -e tcp.dstport -e ip.src -e tcp.srcport -e frame.len -e tcp.len -e tcp.hdr_len -e ip.hdr_len -e frame.time -E header=y | grep "TCP\|tcp"> ./data/tcp_result.tsv
+	
+	echo "Start make udp file"
+	tshark -r $1 -T fields -e _ws.col.Protocol -e udp.stream  -e ip.dst -e udp.dstport -e ip.src -e udp.srcport -e frame.len -e tcp.hdr_len -e ip.hdr_len -e frame.time -E header=y | grep "UDP\|udp"> ./data/udp_result.tsv
+	
+	echo "Finish Converting $1"
+else
+	echo "USAGE: ./convert <pcap file path>"
+fi

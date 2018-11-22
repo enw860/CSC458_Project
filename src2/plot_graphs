@@ -1,0 +1,4 @@
+#!/bin/bash
+
+Rscript analysis_perpack/analysis_perpack.R
+Rscript analysis_perflow/analysis_perflow.R
