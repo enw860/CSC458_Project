@@ -3,7 +3,7 @@ library(gridExtra)
 library(ggplot2)
 library(varhandle)
 
-root_dir <- "/Users/lionel/Desktop/CSC458/Assignment/project_due_1125/src2/"
+root_dir <- "/h/u6/c6/05/wuenaho/csc458/CSC458_Project/src2/"
 
 ################## begin default settings #####################
 source(paste(root_dir, "util/util.R", sep=""))

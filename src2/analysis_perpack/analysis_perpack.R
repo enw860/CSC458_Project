@@ -2,7 +2,7 @@ library(grid)
 library(gridExtra)
 library(ggplot2)
 
-root_dir <- "/Users/lionel/Desktop/CSC458/Assignment/project_due_1125/src/"
+root_dir <- "/h/u6/c6/05/wuenaho/csc458/CSC458_Project/src2/"
 
 # default setting (set your own absoulte path)
 source(paste(root_dir, "util/util.R", sep=""))
