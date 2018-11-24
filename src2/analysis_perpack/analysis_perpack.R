@@ -1,25 +1,37 @@
-library(grid)
-library(gridExtra)
-library(ggplot2)
-
-root_dir <- "/Users/lionel/Desktop/CSC458/Assignment/project_due_1125/src/"
-
-# default setting (set your own absoulte path)
-source(paste(root_dir, "util/util.R", sep=""))
-
-data_dir <- set_filePath(root_dir, "data/") 
-img_dir <- set_filePath(root_dir, "plots/")
-
+################## begin default settings #####################
 other_net_protocol <- c("MS NLB", "LLC", "IPX", "Intel ANS probe")
 other_trans_protocol <- c("VRRP", "PIMv0", "OSPF", "NCS", "IGMPv0", "GRE", "ESP", "IGRP")
 
 x_label <- "packet length"
 y_label <- "cummulate probability"
-######################### start control box #####################
-plot_scatter <- bool_switch(0)
-plot_ecdf <- bool_switch(1)
-plot_cdf <- bool_switch(1)
-######################### end control box #####################
+################## end default settings #####################
+
+################## begin analysis functions #####################
+get_IP_packets <- function(all_packets, filter){
+  ip_data <- data.frame(
+    Protocol=all_packets$X_ws.col.Protocol[ip_filter],
+    frame.len=all_packets$frame.len[ip_filter],
+    frame.cap_len=all_packets$frame.cap_len[ip_filter],
+    ip.total_len=all_packets$ip.len[ip_filter],
+    ip.header=all_packets$ip.hdr_len[ip_filter],
+    tcp.header=all_packets$tcp.hdr_len[ip_filter],
+    tcp.seg_len=all_packets$tcp.len[ip_filter],
+    udp.header=rep(8, sum(ip_filter)),
+    udp.total_len=all_packets$udp.length[ip_filter]
+  )
+  return(ip_data)
+}
+
+get_non_IP_packets <- function(all_packets, filter){
+  non_ip_data <- data.frame(
+    Protocol=all_packets$X_ws.col.Protocol[all_packets$X_ws.col.Protocol %in% other_net_protocol],
+    frame.len=all_packets$frame.len[all_packets$X_ws.col.Protocol %in% other_net_protocol],
+    frame.cap_len=all_packets$frame.cap_len[all_packets$X_ws.col.Protocol %in% other_net_protocol],
+    ip.total_len=all_packets$ip.len[all_packets$X_ws.col.Protocol %in% other_net_protocol],
+    ip.header=all_packets$ip.hdr_len[all_packets$X_ws.col.Protocol %in% other_net_protocol]
+  )
+  return(non_ip_data)
+}
 
 # plot precentage tables
 plot_precentage_tables <- function(data, dir){
@@ -211,37 +223,4 @@ plot_total_headerlen_cdf <- function(data, dir){
     dev.off()
   }
 }
-
-# Load data
-data <- read.table(set_filePath(data_dir, "result.tsv"), sep = "\t" , header = TRUE, stringsAsFactors = FALSE)
-
-data$ip.hdr_len <- suppressWarnings(as.integer(data$ip.hdr_len))
-data$ip.len <- suppressWarnings(as.integer(data$ip.len))
-
-ip_filter <- data$X_ws.col.Protocol %in% c('TCP', 'UDP', 'IPv4', 'IPv6')
-ip_data <- data.frame(
-  Protocol=data$X_ws.col.Protocol[ip_filter],
-  frame.len=data$frame.len[ip_filter],
-  frame.cap_len=data$frame.cap_len[ip_filter],
-  ip.total_len=data$ip.len[ip_filter],
-  ip.header=data$ip.hdr_len[ip_filter],
-  tcp.header=data$tcp.hdr_len[ip_filter],
-  tcp.seg_len=data$tcp.len[ip_filter],
-  udp.header=rep(8, sum(ip_filter)),
-  udp.total_len=data$udp.length[ip_filter]
-)
-
-non_ip_data <- data.frame(
-  Protocol=data$X_ws.col.Protocol[data$X_ws.col.Protocol %in% other_net_protocol],
-  frame.len=data$frame.len[data$X_ws.col.Protocol %in% other_net_protocol],
-  frame.cap_len=data$frame.cap_len[data$X_ws.col.Protocol %in% other_net_protocol],
-  ip.total_len=data$ip.len[data$X_ws.col.Protocol %in% other_net_protocol],
-  ip.header=data$ip.hdr_len[data$X_ws.col.Protocol %in% other_net_protocol]
-)
-
-# plot per-packet analysis bullet point 1
-plot_precentage_tables(data, img_dir)
-
-# plot per-packet analysis bullet point 2
-plot_total_packlen_cdf(data, ip_data, non_ip_data, img_dir)
-plot_total_headerlen_cdf(ip_data, img_dir)
+################## end analysis functions #####################
