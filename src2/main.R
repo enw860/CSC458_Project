@@ -6,8 +6,8 @@ library(rlist)
 
 ################## begin default settings #####################
 # default setting (set your own absoulte path)
-#root_dir <- "/Users/lionel/Desktop/CSC458/Assignment/project_due_1125/src"
-root_dir <- system("pwd", intern = TRUE)
+root_dir <- "/Users/lionel/Desktop/CSC458/Assignment/project_due_1125/src"
+#root_dir <- system("pwd", intern = TRUE)
 
 data_dir <- paste(root_dir, "data/", sep="/")
 img_dir <- paste(root_dir, "plots/", sep="/")
@@ -20,8 +20,8 @@ source(paste(root_dir, "util/util.R", sep="/"))
 ################## end default settings #####################
 
 ######################### start control box ############
-run_perpacket <- bool_switch(1)
-run_perflow <- bool_switch(1)
+run_perpacket <- bool_switch(0)
+run_perflow <- bool_switch(0)
 run_rtt <- bool_switch(1)
 
 plot_scatter <- bool_switch(0)
@@ -32,11 +32,14 @@ plot_cdf <- bool_switch(1)
 ################# start perpacket analysis ##########################
 if(run_perpacket){
   # Load data
+  print("Loading all packet details")
   all_packets <- read.table(set_filePath(data_dir, "result.tsv"), sep = "\t" , header = TRUE, stringsAsFactors = FALSE)
+  
+  # cast header length into number
   all_packets$ip.hdr_len <- suppressWarnings(as.integer(all_packets$ip.hdr_len))
   all_packets$ip.len <- suppressWarnings(as.integer(all_packets$ip.len))
   
-  # parse data
+  # parsing data into groups
   ip_filter <- all_packets$X_ws.col.Protocol %in% c('TCP', 'UDP', 'IPv4', 'IPv6')
   IP_packets <- get_IP_packets(all_packets, ip_filter)
   non_IP_packets <- get_non_IP_packets(all_packets, !ip_filter)
@@ -100,6 +103,6 @@ if(run_rtt){
   analysis_all_stream(img_dir, tcps, analysis_streams)
   
   # plot analysis for median streams for top three TCP connections
-  analysis_median_host_stream(img_dir, tcps, overall_tcp_flows, 3)
+  #analysis_median_host_stream(img_dir, tcps, overall_tcp_flows, 3)
 }
 ################# end RTT analysis ##########################

@@ -243,7 +243,7 @@ exit_state_statistics <- function(img_dir, tcp_flows){
   
   stats <- data.frame(types=types, precenatage=precenatage, count=count)
 
-  png(set_filePath(img_dir, "exit_state_statistics.png"), height=100, width=400)
+  png(set_filePath(img_dir, "exit_state_statistics.png"), height=300, width=400)
   par(mfrow=c(1,1))
   grid.arrange(
     make_table(stats, "Exit State Statistics")
