@@ -57,7 +57,7 @@ extract_stream <- function(all_stream, stream_num){
   )
   
   tcp_flow$ack_type <- "BAB"
-  tcp_flow$ack_type[tcp_flow$dest == tcp_flow$dest[1]] <- "ABA"
+  tcp_flow$ack_type[tcp_flow$ip_dest == tcp_flow$ip_dest[1]] <- "ABA"
   
   return(tcp_flow)
 }
