@@ -188,7 +188,7 @@ byteSum_cdfs <- function(dir ,tcp_flows, udp_flows){
   udp_bytes <- udp_flows$total_bytes
   total_bytes <- c(tcp_bytes, udp_bytes)
   
-  png(set_filePath(dir, "bytes_cdfs.png"), height=800, width=1000)
+  png(set_filePath(dir, "byteSum_cdfs.png"), height=800, width=1000)
   
   par(mfrow=c(2,2))
   cdf(total_bytes, "Total flows bytes cdf", x_label)
@@ -207,7 +207,7 @@ packetCount_cdfs <- function(dir ,tcp_flows, udp_flows){
   udp_count <- udp_flows$packets
   total_count <- c(tcp_count, udp_count)
   
-  png(set_filePath(dir, "count_cdfs.png"), height=800, width=1000)
+  png(set_filePath(dir, "packetCount_cdfs.png"), height=800, width=1000)
   
   par(mfrow=c(2,2))
   cdf(total_count, "Total flows packets count cdf", x_label)
@@ -234,15 +234,15 @@ overhead_cdfs <- function(dir ,tcp_flows){
 
 ################# start plotting UDP and TCP inter arrival time cdf ##################
 inter_packet_arrival_cdfs <- function(dir ,tcp_flows, udp_flows){
-  x_label <- "avgrage inter arriving time (s)"
+  x_label <- "Inter arriving time (s)"
   
   tcp_avg_inter_arriving <- tcp_flows$avg_inter_arriving[!is.na(tcp_flows$avg_inter_arriving)]
   udp_avg_inter_arriving <- udp_flows$avg_inter_arriving[!is.na(udp_flows$avg_inter_arriving)]
   
-  png(set_filePath(dir, "avg_inter_arriving.png"), height=800, width=1000)
+  png(set_filePath(dir, "inter_arriving.png"), height=800, width=1000)
   par(mfrow=c(1,2))
-  cdf(tcp_avg_inter_arriving, "TCP avgrage inter arriving time", x_label)
-  cdf(udp_avg_inter_arriving, "UDP avgrage inter arriving time", x_label)
+  cdf(tcp_avg_inter_arriving, "TCP inter arriving time", x_label)
+  cdf(udp_avg_inter_arriving, "UDP inter arriving time", x_label)
   dev.off()
 }
 ################# end plotting UDP and TCP inter arrival time cdf ##################
@@ -259,7 +259,7 @@ exit_state_statistics <- function(img_dir, tcp_flows){
   
   stats <- data.frame(types=types, precenatage=precenatage, count=count)
 
-  png(set_filePath(img_dir, "exit_state_statistics.png"), height=300, width=400)
+  png(set_filePath(img_dir, "TCP_exitState_statistics.png"), height=300, width=400)
   par(mfrow=c(1,1))
   grid.arrange(
     make_table(stats, "Exit State Statistics")

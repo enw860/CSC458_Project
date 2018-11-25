@@ -84,14 +84,11 @@ analysis_all_stream <- function(img_dir, all_stream, stream_num_list){
 
 analysis_tcp_stream <- function(img_dir, all_stream, stream_num){
   stream <- extract_stream(all_stream, stream_num)
-  #stream <- build_RRT(stream)
   
   png(paste(img_dir, "stream", stream_num,".png", sep=""), height=800, width=1000)
-  
   par(mfrow=c(2, 2))
   sample_rrt_dist(stream)
   estimate_rrt_dist(stream)
-  
   dev.off()
 }
 
@@ -116,41 +113,6 @@ extract_stream <- function(all_stream, stream_num){
   
   return(tcp_flow)
 }
-
-build_RRT <- function(tcp_stream){
-  tcp_stream$rrt <- NA
-  
-  progress <- 0
-  for(i in c(1:nrow(tcp_stream))){
-    tcp_stream <- find_ack_rtt(tcp_stream, i) 
-    
-    if(as.integer(i*100/nrow(tcp_stream)) > progress+9){
-      progress <- as.integer(i*100/nrow(tcp_stream))
-      print(paste(progress,"% done", sep=""))
-    }
-  }
-  
-  return(tcp_stream)
-}
-
-find_ack_rtt <- function(tcp_stream, num){
-  current_tcp_pack <- tcp_stream[num, c(1:ncol(tcp_stream))]
-  
-  # case when lost packet happen
-  if(sum(tcp_stream$seq == current_tcp_pack$seq) != 1){
-    return(tcp_stream)
-  }
-  
-  filter <- tcp_stream$arriving_time > current_tcp_pack$arriving_time & tcp_stream$ack==current_tcp_pack$seq
-  
-  back_traffic <- tcp_stream[filter, c(1:ncol(tcp_stream))]$arriving_time
-  
-  if(length(back_traffic) > 0){
-    tcp_stream[filter, c(1:ncol(tcp_stream))]$ack_rrt[1] <- back_traffic[1] - current_tcp_pack$arriving_time
-  }
-  
-  return(tcp_stream)
-}
 ################# end analyzing RRT for single connection ########################
 
 
@@ -161,9 +123,12 @@ streams_of_top_paired_hosts <- function(tcp_flows, n){
   ret <- NULL
   split_result <- strsplit(top_pairs, ":")
   
+  print("Top three pairs of hosts with most TCP conversations are: ")
   for(i in c(1:n)){
     dest <- split_result[[i]][1]
     src <- split_result[[i]][2]
+    
+    print(paste(c(i, ":", dest, src), collapse = " "))
     
     filter <- tcp_flows$dest_ip==dest & tcp_flows$src_ip==src
     ret[[i]] <- tcp_flows$Stream[filter]
