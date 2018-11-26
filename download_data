@@ -1,0 +1,21 @@
+#!/bin/bash
+
+DATA_DIR="./data"
+
+if [ ! -d $DATA_DIR ]; then
+  mkdir $DATA_DIR
+fi
+
+# pulling data tgz 
+curl -O http://pages.cs.wisc.edu/~tbenson/IMC_DATA/univ1_trace.tgz
+echo ">>>> tgz file downloading done"
+
+# unzip data tgz
+tar -xvzf ./univ1_trace.tgz -C $DATA_DIR
+echo ">>>> Data file extracting done"
+
+if [ $? -eq 0 ]; then
+  # clean up
+  rm -rf univ1_trace.tgz
+  echo ">>>> tgz file cleaning done"
+fi

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+STUDENT_NUM1=1003002289
+STUDENT_NUM2=998325539
+FILE_NO=$(($(($((STUDENT_NUM1 + STUDENT_NUM2)) % 20)) + 1))
+FILE_NAME="./data/univ1_pt$FILE_NO"
+
+if [ $# -eq 1 ]; then 
+	FILE_NAME=$1
+fi
+
+echo "Start Converting all packets"
+tshark -r $FILE_NAME -T fields -e _ws.col.Protocol -e frame.len -e frame.cap_len -e eth.type -e icmp.checksum -e icmpv6.checksum -e ipv6.addr -e ip.hdr_len -e ip.len -e tcp.hdr_len -e tcp.len -e udp.length -e udp.srcport -e udp.dstport -e udp.checksum -E header=y > ./data/result.tsv
+
+echo "Start make tcp file"
+tshark -r $FILE_NAME -T fields -e _ws.col.Protocol -e tcp.stream -e tcp.nxtseq -e tcp.ack -e tcp.analysis.ack_rtt -e tcp.analysis.initial_rtt -e tcp.analysis.retransmission -e tcp.analysis.fast_retransmission -e tcp.connection.fin -e tcp.connection.rst -e tcp.connection.syn -e ip.dst -e tcp.dstport -e ip.src -e tcp.srcport -e frame.len -e tcp.len -e tcp.hdr_len -e ip.hdr_len -e frame.time -E header=y> ./data/tcp_result.tsv
+	
+echo "Start make udp file"
+tshark -r $FILE_NAME -T fields -e _ws.col.Protocol -e udp.stream  -e ip.dst -e udp.dstport -e ip.src -e udp.srcport -e frame.len -e udp.length -e ip.hdr_len -e frame.time -e udp.checksum -E header=y> ./data/udp_result.tsv
+	
+echo "Finish Converting $FILE_NAME"
