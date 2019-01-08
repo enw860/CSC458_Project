@@ -60,3 +60,4 @@ Others:
 	1. a log of compiling `Rscript ./main.R` is in file ./log.txt
 	2. you can find a report of our PCAP analysising under ./report.pdf
 
+Final mark: 38.5 / 40.0
